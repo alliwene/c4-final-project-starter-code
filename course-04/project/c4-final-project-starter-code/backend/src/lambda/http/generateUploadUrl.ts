@@ -5,10 +5,10 @@ import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
 import {
-  updateTodoAttachment,
-  generateUploadUrl
+  // updateTodoAttachment,
+  createAttachmentPresignUrl
 } from '../../businessLogic/todos'
-import { getUserId } from '../utils'
+// import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
 
 const logger = createLogger('updateTodoAttachment')
@@ -16,16 +16,18 @@ const logger = createLogger('updateTodoAttachment')
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const todoId = event.pathParameters.todoId
-    logger.info('Processing updateTodoAttachment event: ', event)
-    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    const userId = getUserId(event)
-    const uploadUrl = await generateUploadUrl(todoId)
+    // const userId = getUserId(event)
+    logger.info('Processing genrate upload url event: ', event)
 
-    await updateTodoAttachment(todoId, userId)
+    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+
+    const uploadUrl = await createAttachmentPresignUrl(todoId)
+
+    // await updateTodoAttachment(todoId, userId)
     return {
       statusCode: 200,
       body: JSON.stringify({
-        uploadUrl
+        uploadUrl: uploadUrl
       })
     }
   }

@@ -70,12 +70,12 @@ export class TodosAccess {
       })
       .promise()
 
-    return todoItem
+    return todoItem as TodoItem
   }
 
   async updateTodoItem(
-    todoId: string,
     userId: string,
+    todoId: string,
     todoUpdate: TodoUpdate
   ): Promise<TodoUpdate> {
     logger.info('Updating a todo item')
@@ -95,11 +95,12 @@ export class TodosAccess {
         },
         ExpressionAttributeNames: {
           '#name': 'name'
-        }
+        },
+        ReturnValues: 'UPDATED_NEW'
       })
       .promise()
 
-    return todoUpdate
+    return todoUpdate as TodoUpdate 
   }
 
   async deleteTodoItem(todoId: string, userId: string): Promise<void> {

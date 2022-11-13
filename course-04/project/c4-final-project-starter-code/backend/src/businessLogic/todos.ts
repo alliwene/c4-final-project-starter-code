@@ -11,6 +11,7 @@ import * as uuid from 'uuid'
 // TODO: Implement businessLogic
 const todosAccess = new TodosAccess()
 const logger = createLogger('TodosLogic')
+const attachmentUtils = new AttachmentUtils()
 
 export async function getAllTodos(userId: string): Promise<TodoItem[]> {
   logger.info('Getting all todos')
@@ -23,11 +24,12 @@ export async function createTodo(
 ): Promise<TodoItem> {
   logger.info('Creating a todo item')
   const todoId = uuid.v4()
-
+  const s3AttachmentUrl = attachmentUtils.getAttachmentUrl(todoId)
   const newTodo: TodoItem = {
     userId,
     todoId,
     createdAt: new Date().toISOString(),
+    attachmentUrl: s3AttachmentUrl,
     done: false,
     ...createTodoRequest
   }
@@ -36,10 +38,10 @@ export async function createTodo(
 }
 
 export async function updateTodo(
-  todoId: string,
   userId: string,
+  todoId: string,
   updateTodoRequest: UpdateTodoRequest
-) {
+): Promise<UpdateTodoRequest> {
   logger.info('Updating a todo item')
   const item = await todosAccess.getTodoItem(todoId, userId)
 
@@ -67,27 +69,26 @@ export async function deleteTodo(
   return todosAccess.deleteTodoItem(todoId, userId)
 }
 
-export async function generateUploadUrl(todoId: string): Promise<string> {
+export async function createAttachmentPresignUrl(todoId: string): Promise<string> {
   logger.info('Generating upload url')
-  const attachmentUtils = new AttachmentUtils()
-  return attachmentUtils.getAttachmentUrl(todoId)
+  return attachmentUtils.generateUploadUrl(todoId)
 }
 
-export async function updateTodoAttachment(
-  todoId: string,
-  userId: string
-): Promise<void> {
-  logger.info('Updating todo attachment')
-  const attachmentUtils = new AttachmentUtils()
-  const attachmentUrl = attachmentUtils.getAttachmentUrl(todoId)
+// export async function updateTodoAttachment(
+//   todoId: string,
+//   userId: string
+// ): Promise<void> {
+//   logger.info('Updating todo attachment')
+//   const attachmentUtils = new AttachmentUtils()
+//   const attachmentUrl = attachmentUtils.generateUploadUrl(todoId)
 
-  const item = await todosAccess.getTodoItem(todoId, userId)
+//   const item = await todosAccess.getTodoItem(todoId, userId)
 
-  if (!item) throw new Error('Item not found')
+//   if (!item) throw new Error('Item not found')
 
-  if (item.userId !== userId) {
-    throw new Error('User not authorized to update item')
-  }
+//   if (item.userId !== userId) {
+//     throw new Error('User not authorized to update item')
+//   }
 
-  await todosAccess.updateTodoAttachmentUrl(todoId, userId, attachmentUrl)
-}
+//   await todosAccess.updateTodoAttachmentUrl(todoId, userId, attachmentUrl)
+// }
