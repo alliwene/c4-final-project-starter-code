@@ -11,7 +11,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
-  lambdaHashingVersion: '20201221'
+  # lambdaHashingVersion: '20201221'
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
@@ -25,7 +25,7 @@ provider:
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-aua-1234${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     JWT_CERT_URL: https://dev-6h06psxubhh1wenc.us.auth0.com/.well-known/jwks.json
 
@@ -122,7 +122,7 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
-          auth: Auth
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -153,7 +153,7 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true
-          auth: Auth
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -184,7 +184,7 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
-          auth: Auth
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
